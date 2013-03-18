@@ -5,6 +5,10 @@ A drop in javascript file which hooks into the request object.
 
 It saves client request headers and ip addresses against the sockjs session id so that you may retrieve them later in the meteor request.
 
+## Installation:
+
+Drop the header-spy.js into your meteor app's server directory.
+
 ## Usage:
 
 ### get_http_header(client, header);
