@@ -3,10 +3,10 @@ var storage = {};
 // Install a ghost listener so we can spy on the client headers.
 function install_spy() {
 	// Surplant the current request and upgrade listeners.
+	var server = WebApp.httpServer;
 	_.each(['request', 'upgrade'], function (event) {
-		var app = __meteor_bootstrap__.app;
-		var old_listeners = app.listeners(event).slice(0);
-		app.removeAllListeners(event);
+		var old_listeners = server.listeners(event).slice(0);
+		server.removeAllListeners(event);
 
 		var listener = function (req) {
 			var args = arguments,
@@ -27,12 +27,12 @@ function install_spy() {
 
 			// Call the old listeners (meteor).
 			_.each(old_listeners, function (old) {
-				old.apply(app, args);
+				old.apply(server, args);
 			});
 		};
 
 		// Hook us up.
-		app.addListener(event, listener);
+		server.addListener(event, listener);
 	});
 }
 
@@ -43,7 +43,7 @@ function install_spy() {
  * @param header The header name to retrieve.
  * @return String The header content.
  */
-get_http_header = function get_http_header(client, header) {
+get_http_header = function(client, header) {
 	var sockjs_id = get_sockjs_id(client);
 	if (sockjs_id && storage[sockjs_id]) {
 		return storage[sockjs_id].headers[header];
@@ -57,7 +57,7 @@ get_http_header = function get_http_header(client, header) {
  * @param direct Whether to not use the forwarded-for header.
  * @return String The header content.
  */
-get_http_remote_ip = function get_http_remote_ip(client, direct) {
+get_http_remote_ip = function(client, direct) {
 	var sockjs_id = get_sockjs_id(client);
 	if (storage[sockjs_id]) {
 		var ip = storage[sockjs_id].remote_ip;
